@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: guestbook
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+          - env: uat
+          - env: prod
+  template:
+    metadata:
+      name: "guestbook-{{env}}"
+    spec:
+      project: default
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "foo-{{env}}"
+      sources:
+        - repoURL: https://github.com/rickdennis/argocd-example-apps.git
+          path: helm-guestbook
+          helm:
+            valueFiles:
+              - $values/values.yaml
+              - "$values/values-{{env}}.yaml"
+        - repoURL: https://github.com/rickdennis/argocd-values.git
+          ref: values
