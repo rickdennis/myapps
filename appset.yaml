@@ -1,14 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: guestbook
+  name: myteam
 spec:
   generators:
     - list:
         elements:
-          - env: dev
-          - env: uat
-          - env: prod
+          - cluster: nonprod
+            url: https://192.168.1.172:6551
+          - cluster: prod
+            url: https://192.168.1.172:6552
   template:
     metadata:
       name: "guestbook-{{env}}"
@@ -16,7 +17,7 @@ spec:
       project: default
       destination:
         server: https://kubernetes.default.svc
-        namespace: "foo-{{env}}"
+        namespace: "myteam-{{env}}"
       syncPolicy:
         automated: {}
       sources:
@@ -24,7 +25,7 @@ spec:
           path: helm-guestbook
           helm:
             valueFiles:
-              - $values/values.yaml
-              - "$values/values-{{env}}.yaml"
+              - $values/myteam/values.yaml
+              - "$values/myteam/{{ cluster }}/values.yaml"
         - repoURL: https://github.com/rickdennis/argocd-values.git
           ref: values
