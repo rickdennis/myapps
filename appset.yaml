@@ -12,7 +12,7 @@ spec:
             url: https://192.168.1.172:6552
   template:
     metadata:
-      name: "guestbook-{{env}}"
+      name: "guestbook-{{ cluster }}"
     spec:
       project: default
       destination:
